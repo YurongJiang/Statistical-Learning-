@@ -1,0 +1,189 @@
+---
+title: "Homework 01"
+output:
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Homework 01
+# Exercise 1
+
+Null hypothese: (1)There is no relationship between TV and sales. (2)There is no relationship between radio and sales. (3)There is no relationship between newspaper and sales
+Conclusions: based on the p-values, TV and radio are relatively significant variables for sales, while newspaper is not.
+
+# Exercise 3
+(a) iii is correct. The reason is as below:
+
+Formula 1 - Staring salary for female = 85 + 10 *GPA + 0.07 *IQ + 0.01 * (GPA * IQ)
+Formula 2 - Staring salary for male = 50 + 20 * GPA + 0.07 * IQ + 0.01 * (GPA * IQ)
+
+While the coefficient of GPA is higher in Formula 2 than in Formula 1, the intercept in Formula 1 is higher than in Formula 2. Therefore, only when the GPA is high enough, males earn more on average than females.
+
+(b) Put IQ=110 and a GPA=4.0 in to Formula 1, then the answer is 137.1.
+
+(c) We should use p-value to decide wheatehr the effect is signicficant or not, other than using the value of coefficient. In addition, even though the coefficient is small, if GPA*IQ is very large, the effect is still significant.
+
+# Exercise 4
+(a) The RSS of cubic regression will be smaller because the cubic regression model is larger and can fit the traning data better.
+
+(b) The RSS of cubic regression will be larger because the true realationship between X and Y is linear.
+
+(c) The RSS of cubic regression will be smaller because a larger model will fit better in terms of traning data.
+
+(d) Becase we don't know the true relation between X and Y, so we can't tell which RSS is larger.
+
+
+# Exercise 5
+(a) 
+$$\hat{y}_i = x_i{\frac{\sum^n_{j=1}x_jy_j}{\sum^n_{k=1}{x_k}^2}} = \sum^n_{j=1}\frac{x_iy_j}{\sum^n_{k=1}{x_k}^2}y_j = \sum^n_{j=1}a_jy_j$$
+so
+$$a_j = \frac{x_iy_j}{\sum^n_{k=1}{x_k}^2}$$
+
+# Exercise 6
+According to (3.4), the least square line equation is $y = \hat{\beta_0} + \hat{\beta_1}x$, when \[x = \bar{x}\] we can get this formula:
+\[y = \hat{\beta_0} + \hat{\beta_1}\bar{x} = \bar{y} - \hat{\beta_1}\bar{x} + \hat{\beta_1}\bar{x} = \bar{y}\]
+
+
+# Exercise 7
+assume \[\bar{x} = \bar{y} = 0\]
+Then \[R^2 = 1 - \frac{RSS}{TSS} = 1 - \frac{\sum_i{(y_i - \hat{y}_i)}^2}{\sum_j{y_j}^2}\]  
+
+According to \[\bar{y} = \beta_0 + \beta_1\bar{x} \], when \[\bar{x} = \bar{y} = 0\], then we have \[\beta_0 = 0\]  
+
+So the formula becomes like this : \[\hat{y}_i = \hat{\beta_1}\hat{x}_i \]  
+
+Then we can subsitute \[\hat{y}_i\] in $R^2$ with \[\frac{\sum^n_{j=1}x_jy_j}{\sum^n_{j=1}{x_j}^2}\] according to Question 5
+
+So we get: \[R^2 = 1 - \frac{\sum_i(y_i - \sum_jx_jy_j/\sum_j{x_j}^2x_i)^2}{\sum_j{y_j}^2} = 1 - \frac{\sum_i{y_i}^2 - 2\sum_iy_i(\sum_jx_jy_j/\sum_j{x_j}^2)x_i + \sum_i(\sum_jx_jy_j/\sum_j{x_j}^2)^2{x_i}^2}{\sum_j{y_j}^2}\]
+Then we get: 
+\[R^2 = \frac{\sum_j{y_j}^2 - (\sum_i{y_i}^2 - 2\sum_iy_i(\sum_jx_jy_j/\sum_j{x_j}^2)x_i + \sum_i(\sum_jx_jy_j/\sum_j{x_j}^2)^2{x_i}^2)}{\sum_j{y_j}^2}\]
+after calculation: 
+\[R^2 = \frac{2(\sum_ix_iy_i)^2/\sum_j{x_j}^2 - (\sum_ix_iy_i)^2/\sum_j{x_j}^2}{\sum_j{y_j}^2} = \frac{(\sum_ix_iy_i)^2}{\sum_j{x_j}^2\sum_j{y_j}^2} = Cor(X,Y)^2\]
+
+# Exercise 8
+```{r}
+library(ISLR)
+attach(Auto)
+lm.fit = lm(mpg ~ horsepower, data = Auto)
+summary(lm.fit)
+```
+i) Yes, there is. The p-value of the F-statistic is less than 2.2e-16.
+
+ii) The $R^2$ is 0.6059, so 60.59% of the variation in mpg can be explained by horsepower.
+
+iii) Negative.
+
+iv) 
+```{r}
+predict(lm.fit, data.frame(horsepower = 98), interval = 'confidence')
+predict(lm.fit, data.frame(horsepower = 98), interval = 'prediction')
+```
+The predicted mpg is 24.46708.  The CI is between 23.97308 and 24.96108. The PI is between 14.8094 and 34.12476. 
+
+
+(b)
+
+```{r}
+plot(Auto$horsepower,Auto$mpg, xlab = 'horsepower', ylab = 'mpg')
+abline(lm.fit, col = 'red')
+```
+
+
+(c)
+
+```{r}
+par(mfrow = c(2,2))
+plot(lm.fit)
+```
+
+# Exercise 9
+(a)
+
+```{r}
+pairs(Auto)
+```
+
+(b)
+
+```{r}
+library(dplyr)
+Auto %>% select(-name) %>% cor()
+```
+
+(c)
+
+```{r}
+lm.fitall = lm(mpg~.-name, data = Auto)
+summary(lm.fitall)
+```
+i) Yes, there is because the p-value is very small.
+ii) Displacement, weight, year, and origin have a statistically significant relationship with mpg.
+iii) The coefficient for the year variable suggests that when other predictors remain the same, mpg will increase 0.75 when the year variable increases 1 unit.
+
+(d)
+
+```{r}
+par(mfrow = c(2,2))
+plot(lm.fitall)
+```
+
+There are outliers bigger than 2 or smaller than -2. There are also high leverage points like point 14.
+
+(e)
+```{r}
+lim.fitall2 = lm(mpg~cylinders*displacement + displacement*weight, data = Auto)
+summary(lim.fitall2)
+```
+
+ It's significant because the p-value is very small.
+ 
+ 
+(f)
+
+```{r}
+par(mfrow = c(2, 2))
+plot(log(Auto$weight), Auto$mpg)
+plot(sqrt(Auto$weight), Auto$mpg)
+plot((Auto$weight)^2, Auto$mpg)
+```
+
+Based on the graph, we can tell that only the log transformation is similar to linear relationship. Other transformations show the presence of non-linear relationships.
+
+# Exercise 10
+(a)
+```{r}
+carseatsfit = lm(Sales ~ Price + Urban + US, data = Carseats)
+summary(carseatsfit)
+```
+
+(c)
+$$Sales = 13.043469 -0.054459 \times Price -0.021916 \times Urban + 1.200573 \times US + ε$$
+(d)
+Price and US predictors.
+
+(e)
+```{r}
+lm.car = lm(Sales ~ Price + US, data = Carseats)
+summary(lm.car)
+```
+
+(f)
+The $R^2$ for both model is 0.2393 which means that 23.93% of the variation is explained by the model.
+
+(g)
+
+```{r}
+confint(lm.car)
+```
+
+(h)
+
+```{r}
+par(mfrow = c(2, 2))
+plot(lm.car)
+```
+

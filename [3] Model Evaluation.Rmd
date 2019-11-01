@@ -1,0 +1,215 @@
+---
+title: "DSO 530 Homework4 - Yurong Jiang"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#6.8 Exercises 1 
+### We perform best subset, forward stepwise, and backward stepwise selection on a single data set. For each approach, we obtain p + 1 models, containing 0, 1, 2, . . . , p predictors. Explain your answers:
+
+### (a) Which of the three models with k predictors has the smallest training RSS?
+Best subset approach. Because it will try every combination of the k predictors, while other two methods won't. Therefore, best subset approach will find the model with smallest training RSS.
+
+### (b) Which of the three models with k predictors has the smallest test RSS?
+Best subset approach. Because it will try every combination of the k predictors and will find the best model.
+
+###(c)
+i.   TRUE.
+ii.  TRUE.
+iii. FALSE.
+iv.  FALSE.
+v.   FALSE.
+
+
+#6.8 Exercises 2
+(a) iii
+(b) iii
+
+For laso and ridge, both of them are least square with special conditions. Therefore, they are more flexible and decrease variance and increase bias.
+
+#6.8 Exercises 8
+### In this exercise, we will generate simulated data, and will then use this data to perform best subset selection.
+
+###(a) Use the rnorm() function to generate a predictor X of length n = 100, as well as a noise vector 'noise' of length n = 100.
+```{r}
+library(leaps)
+set.seed(1)
+x=rnorm(100)
+noise=rnorm(100)
+```
+
+###(b)Generate a response vector Y of length n = 100 according to the model Y = ??0 + ??1X + ??2X2 + ??3X3 + noise, where ??0, ??1, ??2, and ??3 are constants of your choice.
+```{r}
+beta_0 = 1
+beta_1 = 2
+beta_2 = 3
+beta_3 = 4
+y = beta_0 + beta_1 * x + beta_2 * x ^ 2 + beta_3 * x ^ 3 + noise
+```
+
+
+### (c) Use the regsubsets() function to perform best subset selection in order to choose the best model containing the predictors X,X2, . . .,X10. What is the best model obtained according to Cp, BIC, and adjusted R2? Show some plots to provide evidence for your answer, and report the coefficients of the best model obtained. Note you will need to use the data.frame() function to create a single data set containing both X and Y .
+```{r}
+x_y=data.frame(x)
+for(i in 2:10){x_y[,i] = x_y[,1]^i}
+colnames(x_y)=paste('x_pow', 1:10, sep='_')
+x_y=data.frame(x_y, y)
+regfit.full = regsubsets(y~., data = x_y, nvmax = 10)
+regfit.summary = summary(regfit.full)
+print(regfit.summary)
+```
+
+
+(i) For Cp
+```{r}
+optimal_Cp = which.min(regfit.summary$cp)
+print(optimal_Cp) #4
+plot(regfit.summary$cp, xlab = 'number of variables', ylab = 'Cp', type = 'l')
+points(optimal_Cp, regfit.summary$cp[optimal_Cp], col = 'red')
+coef(regfit.full, optimal_Cp)
+```
+
+(ii) For BIC:
+```{r}
+optimal_BIC= which.min(regfit.summary$bic)
+print(optimal_BIC) #3
+plot(regfit.summary$bic, xlab = 'number of variables', ylab = 'BIC', type = 'l')
+points(optimal_BIC, regfit.summary$bic[optimal_BIC], col = 'red')
+coef(regfit.full, optimal_BIC)
+```
+
+(iii) For R^2:
+```{r}
+optimal_adjr2 = which.max(regfit.summary$adjr2)
+print(optimal_adjr2) #4
+plot(regfit.summary$adjr2, xlab = 'number of variables', ylab = 'adjusted R^2', type = 'l')
+points(optimal_adjr2, regfit.summary$adjr2[optimal_adjr2], col = 'red')
+coef(regfit.full, optimal_adjr2)
+```
+
+### (d) Repeat (c), using forward stepwise selection and also using backwards stepwise selection. How does your answer compare to the results in (c)?
+
+### (1) for forward stepwise selection
+```{r}
+regfit.full = regsubsets(y~., data = x_y, nvmax = 10, method = 'forward')
+regfit.summary=summary(regfit.full)
+print(regfit.summary)
+```
+
+(i) For Cp
+```{r}
+optimal_Cp = which.min(regfit.summary$cp)
+print(optimal_Cp) #4
+plot(regfit.summary$cp, xlab = 'number of variables', ylab = 'cp', type = 'l')
+points(optimal_Cp, regfit.summary$cp[optimal_Cp], col = 'red')
+coef(regfit.full, optimal_Cp)
+```
+
+(ii) For BIC:
+```{r}
+optimal_BIC= which.min(regfit.summary$bic)
+print(optimal_BIC) #3
+plot(regfit.summary$bic, xlab = 'number of variables', ylab = 'BIC', type = 'l')
+points(optimal_BIC, regfit.summary$bic[optimal_BIC], col= 'red')
+coef(regfit.full, optimal_BIC)
+```
+
+(iii) For R^2:
+```{r}
+optimal_adjr2=which.max(regfit.summary$adjr2)
+print(optimal_adjr2) #4
+plot(regfit.summary$adjr2, xlab = 'number of variables', ylab = 'adjusted R^2', type = 'l')
+points(optimal_adjr2, regfit.summary$adjr2[optimal_adjr2], col = 'red')
+coef(regfit.full, optimal_adjr2)
+```
+
+
+### (2) for backward stepwise selection
+```{r}
+regfit.full= regsubsets(y~., data = x_y, nvmax = 10, method = 'backward')
+regfit.summary = summary(regfit.full)
+print(regfit.summary)
+```
+
+(i) For Cp
+```{r}
+optimal_Cp = which.min(regfit.summary$cp)
+print(optimal_Cp) #4
+plot(regfit.summary$cp, xlab= 'number of variables', ylab = 'cp', type = 'l')
+points(optimal_Cp, regfit.summary$cp[optimal_Cp], col = 'red')
+coef(regfit.full, optimal_Cp)
+```
+
+(ii) For BIC:
+```{r}
+optimal_BIC = which.min(regfit.summary$bic)
+print(optimal_BIC) #3
+plot(regfit.summary$bic, xlab = 'number of variables', ylab = 'BIC', type = 'l')
+points(optimal_BIC, regfit.summary$bic[optimal_BIC], col = 'red')
+coef(regfit.full, optimal_BIC)
+```
+
+(iii) For R^2:
+```{r}
+optimal_adjr2 = which.max(regfit.summary$adjr2)
+print(optimal_adjr2) #4
+plot(regfit.summary$adjr2, xlab = 'number of variables', ylab = 'adjusted R^2', type = 'l')
+points(optimal_adjr2, regfit.summary$adjr2[optimal_adjr2], col = 'red')
+coef(regfit.full, optimal_adjr2)
+```
+
+For BIC, the result are the same. For R^2 and Cp. the results are different.
+
+### (e) Now fit a lasso model to the simulated data, again using X,X2, . . . , X10 as predictors. Use cross-validation to select the optimal value of ??. Create plots of the cross-validation error as a function of ??. Report the resulting coefficient estimates, and discuss the results obtained.
+```{r}
+library(glmnet)
+library(Matrix)
+library(foreach)
+grid= 10 ^ seq(3, -2, length =1000)
+X = model.matrix(y~., x_y)[, -1]
+cv.out = cv.glmnet(X, x_y$y, alpha = 1, lambda = grid)
+plot(cv.out)
+best_lambda = cv.out$lambda.min
+print(best_lambda)
+lasso.fit = glmnet(X,x_y$y, alpha = 1)
+predict(lasso.fit, type = 'coefficients', s = best_lambda)[1:11,]
+```
+
+
+### (f) Now generate a response vector Y according to the model Y = ??0 + ??7X7 + error, and perform best subset selection and the lasso. Discuss the results obtained.
+
+```{r}
+beta_7= -1
+y= beta_0 + beta_7 * x ^ 7 + noise
+x_y$y = y
+```
+(1) best subset selection:
+```{r}
+regfit.full = regsubsets(y~., data = x_y, nvmax = 10)
+regfit.summary = summary(regfit.full)
+optimal_Cp = which.min(regfit.summary$cp)
+optimal_BIC = which.min(regfit.summary$bic)
+optimal_adjr2 = which.max(regfit.summary$adjr2)
+coef(regfit.full, optimal_Cp)
+coef(regfit.full, optimal_BIC)
+coef(regfit.full, optimal_adjr2)
+```
+
+(2) Lasso
+```{r}
+grid = 10 ^ seq(3, -2, length =1000)
+X = model.matrix(y~., x_y)[, -1]
+Y = x_y$y
+cv.out = cv.glmnet(X, Y, alpha= 1, lambda= grid)
+plot(cv.out)
+best_lambda = cv.out$lambda.min
+print(best_lambda)
+lasso.fit = glmnet(X, Y, alpha= 1)
+predict(lasso.fit, type = 'coefficients', s= best_lambda)[1:11,]
+```
+
+The lambda should be 0.03895746.
+Best subset selection with BIC produces is the model performe best.
